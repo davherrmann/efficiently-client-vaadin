@@ -90,6 +90,8 @@ public class ViewRenderer
                 return new Dialog(dispatcher);
             case "Refresher":
                 return new Refresher(dispatcher);
+            case "Button":
+                return new Button(dispatcher);
             case "default":
             default:
                 return new NotImplemented(type);
