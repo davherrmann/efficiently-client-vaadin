@@ -86,6 +86,10 @@ public class ViewRenderer
                 return new FormGroup();
             case "Field":
                 return new Field();
+            case "Dialog":
+                return new Dialog(dispatcher);
+            case "Refresher":
+                return new Refresher(dispatcher);
             case "default":
             default:
                 return new NotImplemented(type);
