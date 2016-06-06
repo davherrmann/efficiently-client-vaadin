@@ -7,8 +7,6 @@ import static java.util.stream.Collectors.toList;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
-
 import de.davherrmann.efficiently.app.MySpecialState;
 import de.davherrmann.efficiently.server.Dispatcher;
 import de.davherrmann.immutable.Immutable;
@@ -25,13 +23,21 @@ public class ViewRenderer
 
     public Element createComponentFrom(Map<String, Object> template)
     {
-        final String type = typeOf(template);
-        final List<Map<String, Object>> content = contentOf(template);
-        final Element element = createElement(type);
+        final Element element = createElement(typeOf(template));
+        final Object content = template.get("content");
 
-        element.changeContent(content.stream() //
-            .map(this::createComponentFrom) //
-            .collect(toList()));
+        if (content instanceof String)
+        {
+            bindings.add(new Binding((String) content, element, "content"));
+        }
+        else if (content instanceof List)
+        {
+            @SuppressWarnings("unchecked")
+            final List<Map<String, Object>> contentList = (List<Map<String, Object>>) content;
+            element.changeContent(contentList.stream() //
+                .map(this::createComponentFrom) //
+                .collect(toList()));
+        }
 
         // put source -> type into binding map
         template.entrySet().stream() //
@@ -45,31 +51,6 @@ public class ViewRenderer
     private String sourceFromDerivation(final Object value)
     {
         return ((Map<String, String>) value).get("sourceValue");
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<Map<String, Object>> contentOf(Map<String, Object> template)
-    {
-        final Object content = template.get("content");
-
-        if (content == null)
-        {
-            return newArrayList();
-        }
-
-        if (content instanceof String)
-        {
-            return newArrayList(ImmutableMap.<String, Object>builder() //
-                .put("type", "Label") //
-                .build());
-        }
-
-        if (content instanceof List)
-        {
-            return (List<Map<String, Object>>) content;
-        }
-
-        return newArrayList();
     }
 
     private Element createElement(String type)
@@ -114,7 +95,11 @@ public class ViewRenderer
             .forEach(binding -> {
                 final Element element = binding.element();
                 final String property = binding.property();
-                if (element instanceof Bindable)
+                if ("content".equals(property))
+                {
+                    element.changeContent((String) value);
+                }
+                else if (element instanceof Bindable)
                 {
                     ((Bindable) element).changeProperty(property, value);
                 }
