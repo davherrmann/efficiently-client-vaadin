@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 import com.vaadin.event.UIEvents;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Label;
 
 import de.davherrmann.efficiently.components.Refresher.RefresherProperties;
 import de.davherrmann.efficiently.server.Action;
@@ -15,7 +15,7 @@ import de.davherrmann.efficiently.server.Dispatcher;
 
 public class Refresher implements Element, BindingHolder<RefresherProperties>
 {
-    private final Component dummy = new CssLayout();
+    private final Label dummy = new Label();
     private final Map<String, Consumer<Object>> propertyBindings = newHashMap();
     private final UIEvents.PollListener pollListener;
 
@@ -28,11 +28,13 @@ public class Refresher implements Element, BindingHolder<RefresherProperties>
         bind(path()::refresh).to(refresh -> {
             if (refresh)
             {
+                dummy.setValue("refreshing...");
                 dummy.getUI().addPollListener(pollListener);
                 dummy.getUI().setPollInterval(delay);
             }
             else
             {
+                dummy.setValue("");
                 dummy.getUI().removePollListener(pollListener);
                 dummy.getUI().setPollInterval(-1);
             }
