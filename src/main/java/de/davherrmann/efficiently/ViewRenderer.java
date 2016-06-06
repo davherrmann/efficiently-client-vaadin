@@ -73,6 +73,8 @@ public class ViewRenderer
                 return new Refresher(dispatcher);
             case "Button":
                 return new Button(dispatcher);
+            case "Table":
+                return new Table();
             case "default":
             default:
                 return new NotImplemented(type);
