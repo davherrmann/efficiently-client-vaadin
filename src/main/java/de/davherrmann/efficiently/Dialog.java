@@ -27,6 +27,7 @@ public class Dialog implements Element, BindingHolder<DialogProperties>
 
         final HorizontalLayout actionsLayout = new HorizontalLayout();
         final Window dialog = new PreventCloseWindow("Test", actionsLayout);
+        dialog.center();
 
         bind(path()::hidden).to(hidden -> {
             if (!hidden)
